@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dx="http://schemas.devexpress.com/maui"
+             xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:strings="clr-namespace:ChatAI.Resources"
+             ios:Page.UseSafeArea="true"
+             x:Class="ChatAI.Views.SettingsPage"
+             xmlns:local="clr-namespace:ChatAI.ViewModels"
+             x:DataType="local:SettingsViewModel">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing"
+                                    Command="{Binding CommandInit}" />
+    </ContentPage.Behaviors>
+    <ContentPage.Resources>
+        <Style TargetType="dx:FormGroupItem">
+            <Setter Property="HeaderFontAttributes" Value="Bold" />
+        </Style>
+        
+
+
+    </ContentPage.Resources>
+
+
+
+    <ScrollView>
+
+        <dx:DXStackLayout Orientation = "Vertical" Padding="20,30" ItemSpacing="10">
+
+            <dx:DataFormView x:Name = "DFVCredential" ValidateProperty="DFVCredential_ValidateProperty" DataObject="{Binding CredentialDataObject}"  >
+                <dx:DataFormTextItem FieldName="EndPoint" InplaceLabelText="{x:Static strings:AppResources.SettingsStringId_EndPoint}" IsInplaceLabelFloating="True" IsLabelVisible="False"  ReturnType="Next" />
+                <dx:DataFormPasswordItem  FieldName="ApiKey" InplaceLabelText="{x:Static strings:AppResources.SettingsStringId_ApiKey}" IsInplaceLabelFloating="True" IsLabelVisible="False"/>
+                <dx:DataFormTextItem FieldName="ChatClientDeploymentName" InplaceLabelText="{x:Static strings:AppResources.SettingsStringId_ChatClientDeploymentName}" IsInplaceLabelFloating="True" IsLabelVisible="False"  ReturnType="Next" />
+                <dx:DataFormTextItem FieldName="ImageClientDeploymentName" InplaceLabelText="{x:Static strings:AppResources.SettingsStringId_ImageClientDeploymentName}" IsInplaceLabelFloating="True" IsLabelVisible="False"  ReturnType="Next" />
+            </dx:DataFormView>
+
+            <dx:DXButton  
+    ButtonType="Accent"
+    Content="{x:Static strings:AppResources.SettingsStringId_CaptionSave}" 
+    TextColor="Black"
+    FontSize="20"
+    DisabledTextColor="DarkGray"
+    PressedTextColor="White"
+    HeightRequest="60"
+    ShowIcon="False"
+    Icon="clear"
+    IconColor="Black"
+    DisabledIconColor="DarkGray"
+    PressedIconColor="White"  
+
+    BorderThickness="2"
+    BorderColor="{AppThemeBinding Light=Black, Dark=White}"
+    DisabledBorderColor="DarkGray"
+    PressedBorderColor="DarkOrange"
+    CornerRadius="20"
+
+    
+    DisabledBackgroundColor="Brown"
+    PressedBackgroundColor="Gray"  
+                Clicked="DXButton_Clicked"
+    
+    ThemeSeedColor="Red"
+ />
+
+        </dx:DXStackLayout>
+
+    </ScrollView>
+
+</ContentPage>

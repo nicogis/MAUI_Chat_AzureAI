@@ -1,0 +1,229 @@
+<ContentPage   
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:dx="http://schemas.devexpress.com/maui"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:ios="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;assembly=Microsoft.Maui.Controls"
+    x:Class="ChatAI.Views.ChatPage"
+    xmlns:vm="clr-namespace:ChatAI.ViewModels"
+    xmlns:t="clr-namespace:ChatAI.ViewModels.Templates"
+    xmlns:e="clr-namespace:ChatAI.Enums"
+    xmlns:strings="clr-namespace:ChatAI.Resources"
+    xmlns:md="clr-namespace:ChatAI.Maui.Controls.Markdown"
+    ios:Page.UseSafeArea="true">
+
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing"
+                                Command="{Binding CommandInit}" />
+    </ContentPage.Behaviors>
+    <ContentPage.Resources>
+           
+           
+            <ResourceDictionary>
+                <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+                <toolkit:EnumToBoolConverter x:Key="ServiceTypeConverter" />
+            </ResourceDictionary>
+        
+        <DataTemplate x:Key="senderMessageTemplate"  x:DataType="{x:Type vm:Message}">
+            <dx:DXContentPresenter
+                Margin="72,4,16,4"
+                Padding="16,8"
+                BackgroundColor="{dx:ThemeColor Primary}"
+                HorizontalOptions="End"
+                MaximumWidthRequest="320"
+                CornerRadius="20"
+                Content="{Binding Text}"
+                TextColor="{dx:ThemeColor OnPrimary}">
+                <dx:DXContentPresenter.Triggers>
+                    <DataTrigger TargetType="dx:DXContentPresenter"
+                        Binding="{Binding IsLastMessage}"
+                        Value="true">
+                        <Setter Property="CornerRadius" Value="20,20,20,8"/>
+                        <Setter Property="Margin" Value="72,4,16,16"/>
+                    </DataTrigger>
+                </dx:DXContentPresenter.Triggers>
+            </dx:DXContentPresenter>
+        </DataTemplate>
+        <DataTemplate x:Key="recipientMessageTemplate" x:DataType="{x:Type vm:Message}">
+            <Grid ColumnSpacing="16" ColumnDefinitions="40,*" Margin="16,4">
+                <dx:DXBorder BackgroundColor="{dx:ThemeColor PrimaryContainer}"
+                    VerticalOptions="Center"
+                    WidthRequest="36"
+                    HeightRequest="36"
+                    CornerRadius="18"
+                    IsVisible="{Binding IsLastMessage}">
+                    <Label Text="{Binding Sender.Initials}" TextColor="{dx:ThemeColor OnPrimaryContainer}" VerticalOptions="Center" HorizontalOptions="Center"/>
+                </dx:DXBorder>
+
+                <dx:DXContentPresenter
+                Grid.Column="1"
+                Padding="16,8"
+                BackgroundColor="{dx:ThemeColor PrimaryContainer}"
+                HorizontalOptions="Start"
+                MaximumWidthRequest="320"
+                CornerRadius="20" IsVisible="{Binding ServiceType, Converter={StaticResource ServiceTypeConverter}, ConverterParameter={x:Static e:ServiceType.Image}}">
+                    <!--<dx:ShimmerView IsLoading="{Binding IsBusy}"
+                        WaveWidth="0.2" WaveAngle="30"  WaveOpacity="0.8" WaveBackgroundOpacity="0.5" >-->
+                        <dx:DXImage Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}" >
+                        </dx:DXImage>
+                        <!--<dx:ShimmerView.LoadingView>
+                            <Rectangle  Fill="LightGray" WidthRequest="320" HeightRequest="320"/>
+                        </dx:ShimmerView.LoadingView>
+                    </dx:ShimmerView>-->
+                    
+                    <dx:DXContentPresenter.Triggers>
+                        <DataTrigger TargetType="dx:DXContentPresenter"
+            Binding="{Binding IsLastMessage}"
+            Value="true">
+                            <Setter Property="CornerRadius" Value="20,20,8,20"/>
+                        </DataTrigger>
+                    </dx:DXContentPresenter.Triggers>
+                </dx:DXContentPresenter>
+
+
+                <dx:DXContentPresenter
+                    Grid.Column="1"
+                    Padding="16,8"
+                    BackgroundColor="{dx:ThemeColor PrimaryContainer}"
+                    HorizontalOptions="Start"
+                    MaximumWidthRequest="320"
+                    CornerRadius="20"
+                    
+                    IsVisible="{Binding ServiceType, Converter={StaticResource ServiceTypeConverter}, ConverterParameter={x:Static e:ServiceType.Chat}}"
+                    TextColor="{dx:ThemeColor OnPrimaryContainer}">
+
+                    <md:MarkdownView MarkdownText="{Binding Text}" TextColor="{dx:ThemeColor OnPrimaryContainer}" />
+
+
+                    <!-- Content="{Binding Text}"-->
+                    
+                    <dx:DXContentPresenter.Triggers>
+                        <DataTrigger TargetType="dx:DXContentPresenter"
+                            Binding="{Binding IsLastMessage}"
+                            Value="true">
+                            <Setter Property="CornerRadius" Value="20,20,8,20"/>
+                        </DataTrigger>
+                    </dx:DXContentPresenter.Triggers>
+                </dx:DXContentPresenter>
+                <Grid.Triggers>
+                    <DataTrigger TargetType="Grid"
+                        Binding="{Binding IsLastMessage}"
+                        Value="true">
+                        <Setter Property="Margin" Value="16"/>
+                    </DataTrigger>
+                </Grid.Triggers>
+            </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="dayGroupTemplate">
+            <dx:DXContentPresenter
+                Margin="10"
+                HorizontalOptions="Center"
+                FontSize="11"
+                FontAttributes="Bold"
+                Content="{Binding Value, StringFormat='{}{0:d}'}"
+                TextColor="{dx:ThemeColor OnSurfaceVariant}">
+            </dx:DXContentPresenter>
+        </DataTemplate>
+    </ContentPage.Resources>
+    
+    <dx:SafeKeyboardAreaView>
+        <Grid RowDefinitions="*, Auto">
+            <dx:DXCollectionView
+                x:Name="chatSurface"
+                AllowGroupCollapse="False"
+                GroupHeaderTemplate="{StaticResource dayGroupTemplate}"
+                GroupItemSeparatorThickness="0"
+                ItemsSource="{Binding Messages}"
+                ItemTemplate="{t:MessageTemplateSelector SenderTemplate={StaticResource senderMessageTemplate}, RecipientTemplate={StaticResource recipientMessageTemplate}}"
+                SelectionMode="Single"
+                ReduceSizeToContent="true"
+                VerticalOptions="End"
+                SizeChanged="MessagesCollectionSizeChanged">
+                    <dx:DXCollectionView.GroupDescription>
+                        <dx:GroupDescription FieldName="SentAt" GroupInterval="DateRange" />
+                    </dx:DXCollectionView.GroupDescription>
+            </dx:DXCollectionView>
+            
+            <ActivityIndicator IsVisible="{Binding IsBusy}" IsEnabled="{Binding IsBusy}" IsRunning="{Binding IsBusy}"></ActivityIndicator>
+            
+            <Grid Grid.Row="1" ColumnSpacing="16" ColumnDefinitions="40,*,40" Padding="16,0,16,16">
+                <dx:DXButton 
+Grid.Column="0"
+Command="{Binding SendMessageImageCommand}"
+CommandParameter="{Binding EditMessageText}"
+IconColor="{dx:ThemeColor Primary}"
+Padding="0"
+Margin="0"
+Icon="draw"
+IconIndent="0"
+IconPlacement="Left"
+IconWidth="40"
+IconHeight="40"
+BackgroundColor="{dx:ThemeColor SurfaceVariant}"
+WidthRequest="40"
+HeightRequest="40"
+CornerRadius="40">
+                    
+                </dx:DXButton>
+                <dx:TextEdit Grid.Column="1"
+                    x:Name="messageEditor"
+                    HeightRequest="40"
+                    PlaceholderText="{x:Static strings:AppResources.ChatStringId_TextMessage}"
+                    BackgroundColor="{dx:ThemeColor SurfaceContainer}"
+                    PlaceholderColor="{dx:ThemeColor OnSurfaceVariant}"
+                    BoxPadding="16,8"
+                    BorderThickness="0"
+                    CornerRadius="20"
+                    FocusedBorderThickness="0"
+                    Text="{Binding EditMessageText}"/>
+                
+                <dx:DXButton 
+                    Grid.Column="2"
+                    Command="{Binding SendMessageCommand}"
+                    CommandParameter="{Binding EditMessageText}"
+                    IconColor="{dx:ThemeColor Primary}"
+                    Padding="0"
+                    Margin="0"
+                    Icon="send"
+                    IconIndent="0"
+                    IconPlacement="Left"
+                    IconWidth="40"
+                    IconHeight="40"
+                    BackgroundColor="{dx:ThemeColor SurfaceVariant}"
+                    WidthRequest="40"
+                    HeightRequest="40"
+                    CornerRadius="40">
+                </dx:DXButton>
+            </Grid>
+
+            <dx:DXPopup IsOpen="{Binding IsOpenPopup}"
+         AllowScrim="True" 
+         VerticalAlignment="Bottom"
+         HorizontalAlignment="Stretch"
+         Margin="16"
+         CornerRadius="16">
+                <dx:DXStackLayout Orientation="Vertical">
+                    <Label Text="{Binding PopupTitle}"
+           TextColor="#404144"
+           Margin="24,16,24,14"
+           HorizontalTextAlignment="Center"/>
+
+                    <dx:DXSeparator Style="{StaticResource SeparatorStyle}" Margin="24,0"/>
+
+                    <dx:DXButton Content="{x:Static strings:AppResources.ChatStringId_PopupCancel}"
+                      TextColor="#2088ff"
+                      PressedBackgroundColor="#e8e8e8"
+                      BackgroundColor="Transparent"
+                      Command="{Binding DismissPopupCommand}"
+                      Margin="0,0,0,6"/>
+                </dx:DXStackLayout>
+            </dx:DXPopup>
+        </Grid>
+
+        
+    </dx:SafeKeyboardAreaView>
+    
+
+
+
+</ContentPage>
