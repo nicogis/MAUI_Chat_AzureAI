@@ -22,13 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 */
-namespace ChatAI.Maui.Controls.Markdown;
+
+namespace ChatAI.Controls.MarkdownView;
 
 public static class BuilderExtension
 {
     public static MauiAppBuilder UseMarkdownView(this MauiAppBuilder builder)
     {
-        // for later
+        
 
         return builder;
     }

@@ -28,14 +28,11 @@ SOFTWARE.
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
-using Image = Microsoft.Maui.Controls.Image;
 
-namespace ChatAI.Maui.Controls.Markdown;
 
-public class LinkEventArgs : EventArgs
-{
-    public string Url { get; set; }
-}
+namespace ChatAI.Controls.MarkdownView;
+
+
 
 public class MarkdownView : ContentView
 {
@@ -322,7 +319,9 @@ public class MarkdownView : ContentView
         }
         };
 
+#pragma warning disable SYSLIB1045 // Converti in 'GeneratedRegexAttribute'.
         var lines = Regex.Split(MarkdownText, @"\r\n?|\n", RegexOptions.Compiled);
+#pragma warning restore SYSLIB1045 // Converti in 'GeneratedRegexAttribute'.
         lines = lines.Where(line => !string.IsNullOrEmpty(line)).ToArray();
 
         int gridRow = 0;
@@ -549,7 +548,7 @@ public class MarkdownView : ContentView
 
     private static void HandleActiveCodeBlock(string line, ref Label activeCodeBlockLabel, ref int gridRow)
     {
-        if(IsCodeBlock(line, out bool _))
+        if (IsCodeBlock(line, out bool _))
         {
             activeCodeBlockLabel = null;
             gridRow++;
@@ -560,7 +559,7 @@ public class MarkdownView : ContentView
         }
     }
 
-    private void AddEmptyRow(Grid grid, ref int gridRow)
+    private static void AddEmptyRow(Grid grid, ref int gridRow)
     {
         grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(10) });
         gridRow++;
@@ -625,7 +624,9 @@ public class MarkdownView : ContentView
         listItemIndex = 0;
         string trimmedLine = line.TrimStart();
 
+#pragma warning disable SYSLIB1045 // Converti in 'GeneratedRegexAttribute'.
         var match = Regex.Match(trimmedLine, @"^(\d+)\. ");
+#pragma warning restore SYSLIB1045 // Converti in 'GeneratedRegexAttribute'.
         if (match.Success)
         {
             listItemIndex = int.Parse(match.Groups[1].Value);
@@ -706,13 +707,15 @@ public class MarkdownView : ContentView
     {
         var formattedString = new FormattedString();
 
+#pragma warning disable SYSLIB1045 // Converti in 'GeneratedRegexAttribute'.
         var parts = Regex.Split(line, @"(\*\*.*?\*\*|__.*?__|_.*?_|`.*?`|\[.*?\]\(.*?\)|\*.*?\*)");
+#pragma warning restore SYSLIB1045 // Converti in 'GeneratedRegexAttribute'.
 
         foreach (var part in parts)
         {
             Span span = new();
 
-            if (part.StartsWith("`") && part.EndsWith("`"))
+            if (part.StartsWith('`') && part.EndsWith('`'))
             {
                 span.Text = part.Trim('`');
                 span.BackgroundColor = CodeBlockBackgroundColor;
@@ -799,7 +802,7 @@ public class MarkdownView : ContentView
             VerticalTextAlignment = TextAlignment.Center,
             HorizontalOptions = LayoutOptions.Start,
             Margin = new Thickness(0, 0),
-            Padding = new Thickness(0,0)
+            Padding = new Thickness(0, 0)
         };
 
         grid.Children.Add(bulletPoint);

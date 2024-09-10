@@ -9,7 +9,7 @@
     xmlns:t="clr-namespace:ChatAI.ViewModels.Templates"
     xmlns:e="clr-namespace:ChatAI.Enums"
     xmlns:strings="clr-namespace:ChatAI.Resources"
-    xmlns:md="clr-namespace:ChatAI.Maui.Controls.Markdown"
+    xmlns:md="clr-namespace:ChatAI.Controls.MarkdownView"
     ios:Page.UseSafeArea="true">
 
     <ContentPage.Behaviors>
@@ -208,7 +208,7 @@ CornerRadius="40">
            Margin="24,16,24,14"
            HorizontalTextAlignment="Center"/>
 
-                    <dx:DXSeparator Style="{StaticResource SeparatorStyle}" Margin="24,0"/>
+                    <dx:DXSeparator Margin="24,0"/>
 
                     <dx:DXButton Content="{x:Static strings:AppResources.ChatStringId_PopupCancel}"
                       TextColor="#2088ff"

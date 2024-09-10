@@ -49,11 +49,11 @@
 
 
 	<ItemGroup>
-		<PackageReference Include="Azure.AI.OpenAI" Version="2.0.0-beta.3" />
+		<PackageReference Include="Azure.AI.OpenAI" Version="2.0.0-beta.5" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.3" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.0" />
 		<PackageReference Include="DevExpress.Maui.HtmlEditor" Version="24.1.5" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.80" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.82" />
 		<PackageReference Include="DevExpress.Maui.Controls" Version="24.1.5" />
 		<PackageReference Include="DevExpress.Maui.Core" Version="24.1.5" />
 		<PackageReference Include="DevExpress.Maui.CollectionView" Version="24.1.5" />
@@ -63,7 +63,6 @@
 
 	<ItemGroup>
 		<Folder Include="Models\" />
-		<Folder Include="MDViewer\" />
 	</ItemGroup>
 
 
@@ -88,7 +87,7 @@
 
 
 	<ItemGroup>
-		<PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.80" />
+		<PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.82" />
 	</ItemGroup>
 
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">
