@@ -225,4 +225,7 @@
   <data name="ChatStringId.TextMessage" xml:space="preserve">
     <value>Your text message</value>
   </data>
+  <data name="ChatStringId.ShareImage" xml:space="preserve">
+    <value>Share image</value>
+  </data>
 </root>

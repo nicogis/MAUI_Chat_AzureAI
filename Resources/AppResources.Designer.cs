@@ -115,6 +115,15 @@ namespace ChatAI.Resources {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Share image.
+        /// </summary>
+        internal static string ChatStringId_ShareImage {
+            get {
+                return ResourceManager.GetString("ChatStringId.ShareImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Your text message.
         /// </summary>
         internal static string ChatStringId_TextMessage {

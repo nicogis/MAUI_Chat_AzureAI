@@ -12,18 +12,23 @@
     xmlns:md="clr-namespace:ChatAI.Controls.MarkdownView"
     ios:Page.UseSafeArea="true">
 
+    <!--xmlns:converters="clr-namespace:ChatAI.Converters"-->
+
+
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Appearing"
-                                Command="{Binding CommandInit}" />
+                                Command="{Binding CommandInit}" x:DataType="{x:Type vm:ChatViewModel}" />
     </ContentPage.Behaviors>
     <ContentPage.Resources>
-           
-           
-            <ResourceDictionary>
-                <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
-                <toolkit:EnumToBoolConverter x:Key="ServiceTypeConverter" />
-            </ResourceDictionary>
-        
+
+
+
+        <ResourceDictionary>
+            <toolkit:ByteArrayToImageSourceConverter x:Key="ByteArrayToImageSourceConverter" />
+            <toolkit:EnumToBoolConverter x:Key="ServiceTypeConverter" />
+            <!--<converters:MarkdownToHtmlConverter x:Key="MarkdownToHtmlConverter" />-->
+        </ResourceDictionary>
+
         <DataTemplate x:Key="senderMessageTemplate"  x:DataType="{x:Type vm:Message}">
             <dx:DXContentPresenter
                 Margin="72,4,16,4"
@@ -62,15 +67,19 @@
                 HorizontalOptions="Start"
                 MaximumWidthRequest="320"
                 CornerRadius="20" IsVisible="{Binding ServiceType, Converter={StaticResource ServiceTypeConverter}, ConverterParameter={x:Static e:ServiceType.Image}}">
-                    <!--<dx:ShimmerView IsLoading="{Binding IsBusy}"
-                        WaveWidth="0.2" WaveAngle="30"  WaveOpacity="0.8" WaveBackgroundOpacity="0.5" >-->
-                        <dx:DXImage Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}" >
-                        </dx:DXImage>
-                        <!--<dx:ShimmerView.LoadingView>
-                            <Rectangle  Fill="LightGray" WidthRequest="320" HeightRequest="320"/>
-                        </dx:ShimmerView.LoadingView>
-                    </dx:ShimmerView>-->
                     
+                    <dx:DXImage Source="{Binding Image, Converter={StaticResource ByteArrayToImageSourceConverter}}" >
+
+                        <dx:DXImage.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" CommandParameter="{Binding .}">
+                                
+                            </TapGestureRecognizer>
+                            
+                        </dx:DXImage.GestureRecognizers>
+
+                    </dx:DXImage>
+                    
+
                     <dx:DXContentPresenter.Triggers>
                         <DataTrigger TargetType="dx:DXContentPresenter"
             Binding="{Binding IsLastMessage}"
@@ -94,9 +103,13 @@
 
                     <md:MarkdownView MarkdownText="{Binding Text}" TextColor="{dx:ThemeColor OnPrimaryContainer}" />
 
-
-                    <!-- Content="{Binding Text}"-->
+                    <!--<Label Text="{Binding Text, Converter={StaticResource MarkdownToHtmlConverter}}" TextType="Html"/>-->
                     
+                    
+                    <!-- Content="{Binding Text}"-->
+                        
+                    <!--<dx:HtmlEdit HtmlSource="{Binding Text, Converter={StaticResource MarkdownToHtmlConverter}}"  />-->
+                        
                     <dx:DXContentPresenter.Triggers>
                         <DataTrigger TargetType="dx:DXContentPresenter"
                             Binding="{Binding IsLastMessage}"
@@ -125,7 +138,7 @@
             </dx:DXContentPresenter>
         </DataTemplate>
     </ContentPage.Resources>
-    
+
     <dx:SafeKeyboardAreaView>
         <Grid RowDefinitions="*, Auto">
             <dx:DXCollectionView
@@ -139,13 +152,13 @@
                 ReduceSizeToContent="true"
                 VerticalOptions="End"
                 SizeChanged="MessagesCollectionSizeChanged">
-                    <dx:DXCollectionView.GroupDescription>
-                        <dx:GroupDescription FieldName="SentAt" GroupInterval="DateRange" />
-                    </dx:DXCollectionView.GroupDescription>
+                <dx:DXCollectionView.GroupDescription>
+                    <dx:GroupDescription FieldName="SentAt" GroupInterval="DateRange" />
+                </dx:DXCollectionView.GroupDescription>
             </dx:DXCollectionView>
-            
+
             <ActivityIndicator IsVisible="{Binding IsBusy}" IsEnabled="{Binding IsBusy}" IsRunning="{Binding IsBusy}"></ActivityIndicator>
-            
+
             <Grid Grid.Row="1" ColumnSpacing="16" ColumnDefinitions="40,*,40" Padding="16,0,16,16">
                 <dx:DXButton 
 Grid.Column="0"
@@ -163,7 +176,7 @@ BackgroundColor="{dx:ThemeColor SurfaceVariant}"
 WidthRequest="40"
 HeightRequest="40"
 CornerRadius="40">
-                    
+
                 </dx:DXButton>
                 <dx:TextEdit Grid.Column="1"
                     x:Name="messageEditor"
@@ -176,7 +189,7 @@ CornerRadius="40">
                     CornerRadius="20"
                     FocusedBorderThickness="0"
                     Text="{Binding EditMessageText}"/>
-                
+
                 <dx:DXButton 
                     Grid.Column="2"
                     Command="{Binding SendMessageCommand}"
@@ -220,9 +233,9 @@ CornerRadius="40">
             </dx:DXPopup>
         </Grid>
 
-        
+
     </dx:SafeKeyboardAreaView>
-    
+
 
 
 

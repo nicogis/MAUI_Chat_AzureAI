@@ -20,7 +20,7 @@ public class AboutViewModel : BaseViewModel
     }
 
 
-    public Task<Boolean> OpenSite()
+    public static Task<Boolean> OpenSite()
     {
         return Browser.OpenAsync(AppResources.AboutStringId_SiteWebCompany, BrowserLaunchMode.External);
     }

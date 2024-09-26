@@ -22,6 +22,7 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
 
 		<NeutralLanguage>en-US</NeutralLanguage>
+		<NoWarn>$(NoWarn);SYSLIB1045</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -41,6 +42,14 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Remove="Converters\MarkdownToHtmlConverter.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Resources\Images\icon.png" />
+	</ItemGroup>
+
 	
 
 	
@@ -49,19 +58,20 @@
 
 
 	<ItemGroup>
-		<PackageReference Include="Azure.AI.OpenAI" Version="2.0.0-beta.5" />
+		<PackageReference Include="Azure.AI.OpenAI" Version="2.0.0-beta.6" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.3" />
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.0" />
-		<PackageReference Include="DevExpress.Maui.HtmlEditor" Version="24.1.5" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.82" />
-		<PackageReference Include="DevExpress.Maui.Controls" Version="24.1.5" />
-		<PackageReference Include="DevExpress.Maui.Core" Version="24.1.5" />
-		<PackageReference Include="DevExpress.Maui.CollectionView" Version="24.1.5" />
-		<PackageReference Include="DevExpress.Maui.Editors" Version="24.1.5" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+		<PackageReference Include="DevExpress.Maui.HtmlEditor" Version="24.1.6" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.91" />
+		<PackageReference Include="DevExpress.Maui.Controls" Version="24.1.6" />
+		<PackageReference Include="DevExpress.Maui.Core" Version="24.1.6" />
+		<PackageReference Include="DevExpress.Maui.CollectionView" Version="24.1.6" />
+		<PackageReference Include="DevExpress.Maui.Editors" Version="24.1.6" />
 	</ItemGroup>
 
 
 	<ItemGroup>
+		<Folder Include="Converters\" />
 		<Folder Include="Models\" />
 	</ItemGroup>
 
@@ -87,7 +97,7 @@
 
 
 	<ItemGroup>
-		<PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.82" />
+		<PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.91" />
 	</ItemGroup>
 
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">

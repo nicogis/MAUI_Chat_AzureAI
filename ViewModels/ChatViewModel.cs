@@ -32,18 +32,19 @@ public partial class ChatViewModel : ObservableObject
 
     private readonly IOpenAIService openAIService;
 
-    public Command CommandInit { get; } 
+    public Command CommandInit { get; }
+    
 
     public ChatViewModel(IOpenAIService openAIService)
     {
 
         this.openAIService = openAIService;
         CommandInit = new Command(Init);
-       
 
+        
     }
 
-
+    
     async void Init()
     {
         try

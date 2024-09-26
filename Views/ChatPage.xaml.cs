@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using ChatAI.Resources;
 using ChatAI.ViewModels;
 
 namespace ChatAI.Views;
@@ -21,6 +22,26 @@ public partial class ChatPage : ContentPage
     private void MessagesCollectionSizeChanged(object sender, EventArgs e)
     {
         chatSurface.ScrollTo(chatSurface.GetItemHandleByVisibleIndex(chatSurface.VisibleItemCount - 1));
+    }
+
+    private async void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
+    {
+        
+        Message o = e.Parameter as Message;
+
+        byte[] image = o?.Image;
+
+        if (image != null) 
+        {
+            string file = Path.Combine(FileSystem.Current.CacheDirectory, $"{Guid.NewGuid()}.png");
+            File.WriteAllBytes(file, image);
+
+            await Share.RequestAsync(new ShareFileRequest
+            {
+                Title = AppResources.ChatStringId_ShareImage,
+                File = new ShareFile(file)
+            });
+        }
     }
 }
 
