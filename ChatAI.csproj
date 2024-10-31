@@ -61,12 +61,15 @@
 		<PackageReference Include="Azure.AI.OpenAI" Version="2.0.0" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="9.1.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+		<PackageReference Include="CSharpMath.SkiaSharp" Version="0.5.1" />
 		<PackageReference Include="DevExpress.Maui.HtmlEditor" Version="24.1.6" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.92" />
 		<PackageReference Include="DevExpress.Maui.Controls" Version="24.1.6" />
 		<PackageReference Include="DevExpress.Maui.Core" Version="24.1.6" />
 		<PackageReference Include="DevExpress.Maui.CollectionView" Version="24.1.6" />
 		<PackageReference Include="DevExpress.Maui.Editors" Version="24.1.6" />
+		<PackageReference Include="SkiaSharp.Extended.UI.Maui" Version="2.0.0" />
+		<PackageReference Include="SkiaSharp.Svg" Version="1.60.0" />
 		<PackageReference Include="System.Text.Json" Version="8.0.5" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.92" />
 	</ItemGroup>

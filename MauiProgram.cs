@@ -1,4 +1,5 @@
-﻿using ChatAI.ViewModels;
+﻿using ChatAI.Controls.MarkdownView;
+using ChatAI.ViewModels;
 using ChatAI.Views;
 using CommunityToolkit.Maui;
 using DevExpress.Maui;
@@ -20,6 +21,7 @@ public static class MauiProgram
             .UseDevExpressCollectionView()
             .UseDevExpressEditors()
             .UseDevExpressHtmlEditor()
+            .UseMarkdownView()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

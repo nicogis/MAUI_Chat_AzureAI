@@ -25,12 +25,13 @@ SOFTWARE.
 
 namespace ChatAI.Controls.MarkdownView;
 
+using SkiaSharp.Views.Maui.Controls.Hosting;
+
 public static class BuilderExtension
 {
     public static MauiAppBuilder UseMarkdownView(this MauiAppBuilder builder)
     {
-        
-
+        builder.UseSkiaSharp();
         return builder;
     }
 }

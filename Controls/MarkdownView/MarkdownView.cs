@@ -24,17 +24,23 @@ SOFTWARE.
 */
 
 
-
+using Microsoft.Maui.Controls.Shapes;
+using SkiaSharp;
 using System.ComponentModel;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Input;
-using Microsoft.Maui.Controls.Shapes;
 using Image = Microsoft.Maui.Controls.Image;
 
 namespace ChatAI.Controls.MarkdownView;
 
 public class MarkdownView : ContentView
 {
+
+    public static readonly Regex KaTeXBlockRegex = new Regex(@"\$\$(.*?)\$\$", RegexOptions.Compiled | RegexOptions.Singleline);
+    public static readonly Regex KaTeXInlineRegex = new Regex(@"\$(.*?)\$", RegexOptions.Compiled);
+
+    private readonly Thickness _defaultListIndent = new(10, 0, 10, 0);
     private Dictionary<string, ImageSource> _imageCache = [];
 
     public delegate void HyperLinkClicked(object sender, LinkEventArgs e);
@@ -361,6 +367,16 @@ public class MarkdownView : ContentView
         set => SetValue(ImageAspectProperty, value);
     }
 
+
+    public static readonly BindableProperty ListIndentProperty =
+    BindableProperty.Create(nameof(ListIndent), typeof(Thickness), typeof(MarkdownView), propertyChanged: OnMarkdownTextChanged);
+
+    public Thickness ListIndent
+    {
+        get => (Thickness)GetValue(ListIndentProperty);
+        set => SetValue(ListIndentProperty, value);
+    }
+
     private static void OnMarkdownTextChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (MarkdownView)bindable;
@@ -371,20 +387,19 @@ public class MarkdownView : ContentView
         if (string.IsNullOrWhiteSpace(MarkdownText))
             return;
 
-        // Clear existing content
         Content = null;
 
         var grid = new Grid
         {
             Margin = new Thickness(0, 0, 0, 0),
             Padding = new Thickness(0, 0, 0, 0),
-            RowSpacing = 2,
+            RowSpacing = 3,
             ColumnSpacing = 0,
             ColumnDefinitions =
-        {
-            new ColumnDefinition { Width = 15 }, // For bullet points or ordered list numbers
-            new ColumnDefinition { Width = GridLength.Star } // For text
-        }
+            {
+                new ColumnDefinition { Width = GridLength.Auto },
+                new ColumnDefinition { Width = GridLength.Star }
+            }
         };
 
         var lines = Regex.Split(MarkdownText, @"\r\n?|\n", RegexOptions.Compiled);
@@ -400,6 +415,7 @@ public class MarkdownView : ContentView
         for (int i = 0; i < lines.Length; i++)
         {
             string line = lines[i].Trim();
+
             bool lineBeforeWasBlockQuote = currentLineIsBlockQuote;
             currentLineIsBlockQuote = false;
             if (activeCodeBlockLabel == null)
@@ -455,6 +471,13 @@ public class MarkdownView : ContentView
                 HandleBlockQuote(line, lineBeforeWasBlockQuote, grid, out currentLineIsBlockQuote, ref gridRow);
                 isExitingList = false;
             }
+            else if (IsTaskList(line, out bool isChecked))
+            {
+                AddTaskListItemToGrid(line[6..], isChecked, grid, gridRow);
+                gridRow++;
+                isExitingList = true;
+                continue;
+            }
             else if (IsUnorderedList(line))
             {
                 if (!isUnorderedListActive)
@@ -502,6 +525,35 @@ public class MarkdownView : ContentView
                 Grid.SetColumnSpan(horizontalLine, 2);
                 gridRow++;
                 isExitingList = false;
+            }
+            else if (IsKaTeXBlock(line))
+            {
+                var match = KaTeXBlockRegex.Match(line);
+                var latexFormula = match.Groups[1].Value;
+
+                var latexView = new LatexView
+                {
+                    Text = latexFormula,
+                    FontSize = (float)(TextFontSize * 4),
+                    TextColor = TextColor,
+                    HighlightColor = Colors.Transparent,
+                    ErrorColor = Colors.Red,
+                    HorizontalOptions = LayoutOptions.Center,
+                    VerticalOptions = LayoutOptions.Center,
+                };
+
+                grid.Children.Add(latexView);
+                Grid.SetRow(latexView, gridRow++);
+                Grid.SetColumnSpan(latexView, 2);
+                continue;
+            }
+            else if (IsKaTeXInline(line))
+            {
+                var katexGrid = CreateInlineKatexBlock(line, TextColor);
+                grid.Children.Add(katexGrid);
+                Grid.SetRow(katexGrid, gridRow++);
+                Grid.SetColumnSpan(katexGrid, 2);
+                continue;
             }
             else if (IsTable(lines, i, out int tableEndIndex)) // Detect table
             {
@@ -634,10 +686,22 @@ public class MarkdownView : ContentView
         }
     }
 
-    private static void AddEmptyRow(Grid grid, ref int gridRow)
+    private void AddEmptyRow(Grid grid, ref int gridRow)
     {
         grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(10) });
         gridRow++;
+    }
+
+    private static bool IsKaTeXBlock(string line)
+    {
+        string trimmedLine = line.TrimStart();
+        return KaTeXBlockRegex.IsMatch(trimmedLine);
+    }
+
+    private static bool IsKaTeXInline(string line)
+    {
+        string trimmedLine = line.TrimStart();
+        return KaTeXInlineRegex.IsMatch(trimmedLine);
     }
 
     private static bool IsHorizontalRule(string line)
@@ -709,6 +773,12 @@ public class MarkdownView : ContentView
         return false;
     }
 
+    private static bool IsTaskList(string line, out bool isChecked)
+    {
+        isChecked = line.StartsWith("- [x]", StringComparison.OrdinalIgnoreCase);
+        return line.StartsWith("- [ ]") || isChecked;
+    }
+
     private static bool IsTable(string[] lines, int currentIndex, out int tableEndIndex)
     {
         tableEndIndex = currentIndex;
@@ -753,7 +823,6 @@ public class MarkdownView : ContentView
 
         return image;
     }
-
     private Border CreateCodeBlock(string codeText, out Label contentLabel)
     {
         Label content = new()
@@ -783,9 +852,9 @@ public class MarkdownView : ContentView
 
         foreach (var part in parts)
         {
-            Span span = new();
+            Span span = new Span();
 
-            if (part.StartsWith('`') && part.EndsWith('`'))
+            if (part.StartsWith("`") && part.EndsWith("`"))
             {
                 span.Text = part.Trim('`');
                 span.BackgroundColor = CodeBlockBackgroundColor;
@@ -804,22 +873,25 @@ public class MarkdownView : ContentView
             }
             else if (part.StartsWith("__") && part.EndsWith("__"))
             {
+                span.TextColor = textColor;
                 span.Text = part.Trim('_', ' ');
                 span.FontAttributes = FontAttributes.Bold;
             }
             else if (part.StartsWith('_') && part.EndsWith('_'))
             {
+                span.TextColor = textColor;
                 span.Text = part.Trim('_', ' ');
                 span.FontAttributes = FontAttributes.Italic;
             }
             else if (part.StartsWith("~~") && part.EndsWith("~~"))
             {
+                span.TextColor = textColor;
                 span.Text = part.Trim('~');
                 span.TextDecorations = TextDecorations.Strikethrough;
             }
             else if (part.StartsWith('[') && part.Contains("](")) // Detect link
             {
-                var linkText = part[1..part.IndexOf(']')];
+                var linkText = part.Substring(1, part.IndexOf(']') - 1);
                 var linkUrl = part.Substring(part.IndexOf('(') + 1, part.IndexOf(')') - part.IndexOf('(') - 1);
 
                 span.Text = linkText;
@@ -831,6 +903,7 @@ public class MarkdownView : ContentView
             }
             else if (part.StartsWith('*') && part.EndsWith('*'))
             {
+                span.TextColor = textColor;
                 span.Text = part.Trim('*');
                 span.FontAttributes = FontAttributes.Italic;
             }
@@ -840,7 +913,6 @@ public class MarkdownView : ContentView
             }
 
             span.FontSize = TextFontSize;
-            span.TextColor = textColor;
             span.FontFamily = TextFontFace;
 
             formattedString.Spans.Add(span);
@@ -849,17 +921,87 @@ public class MarkdownView : ContentView
         return formattedString;
     }
 
+    private Grid CreateInlineKatexBlock(string line, Color textColor)
+    {
+        var grid = new Grid
+        {
+            ColumnDefinitions =
+        {
+            new ColumnDefinition { Width = GridLength.Auto },
+            new ColumnDefinition { Width = GridLength.Auto },
+            new ColumnDefinition { Width = GridLength.Auto }
+        },
+            RowDefinitions =
+        {
+            new RowDefinition { Height = GridLength.Auto }
+        }
+        };
+
+        var match = KaTeXInlineRegex.Match(line);
+
+        if (match.Success)
+        {
+            string beforeText = line[..match.Index];
+            string katexFormula = match.Groups[1].Value;
+            string afterText = line[(match.Index + match.Length)..];
+
+            if (!string.IsNullOrEmpty(beforeText))
+            {
+                var beforeLabel = new Label
+                {
+                    Text = beforeText,
+                    TextColor = textColor,
+                    FontSize = TextFontSize,
+                    FontFamily = TextFontFace,
+                    VerticalOptions = LayoutOptions.Center
+                };
+                grid.Children.Add(beforeLabel);
+                Grid.SetColumn(beforeLabel, 0);
+            }
+
+            var latexView = new LatexView
+            {
+                Text = katexFormula,
+                FontSize = (float)TextFontSize * 4,
+                TextColor = TextColor,
+                HighlightColor = Colors.Transparent,
+                ErrorColor = Colors.Red,
+                HorizontalOptions = LayoutOptions.Start,
+                VerticalOptions = LayoutOptions.Center,
+                Margin = new Thickness(-10, -10)
+            };
+            grid.Children.Add(latexView);
+            Grid.SetColumn(latexView, 1);
+
+            if (!string.IsNullOrEmpty(afterText))
+            {
+                var afterLabel = new Label
+                {
+                    Text = afterText,
+                    TextColor = textColor,
+                    FontSize = TextFontSize,
+                    FontFamily = TextFontFace,
+                    VerticalOptions = LayoutOptions.Center
+                };
+                grid.Children.Add(afterLabel);
+                Grid.SetColumn(afterLabel, 2);
+            }
+        }
+        return grid;
+    }
+
 
     private void AddBulletPointToGrid(Grid grid, int gridRow)
     {
         string bulletPointSign = "-";
 
 #if ANDROID
-        bulletPointSign = "\u2022";
+    bulletPointSign = "\u2022";
 #endif
 #if iOS
-        bulletPointSign = "\u2029";
+    bulletPointSign = "\u2029";
 #endif
+
         var bulletPoint = new Label
         {
             Text = bulletPointSign,
@@ -871,8 +1013,8 @@ public class MarkdownView : ContentView
             HorizontalTextAlignment = TextAlignment.Start,
             VerticalTextAlignment = TextAlignment.Start,
             HorizontalOptions = LayoutOptions.Start,
-            Margin = new Thickness(0, 0),
-            Padding = new Thickness(0, 0)
+            Margin = (ListIndent != _defaultListIndent) ? ListIndent : _defaultListIndent,
+            Padding = new Thickness(0, 0),
         };
 
         grid.Children.Add(bulletPoint);
@@ -888,13 +1030,14 @@ public class MarkdownView : ContentView
             FontSize = TextFontSize,
             FontFamily = TextFontFace,
             TextColor = TextColor,
-            FontAutoScalingEnabled = true,
+            FontAutoScalingEnabled = false,
             VerticalOptions = LayoutOptions.Start,
             HorizontalOptions = LayoutOptions.Start,
             HorizontalTextAlignment = TextAlignment.Start,
             VerticalTextAlignment = TextAlignment.Start,
-            Margin = new Thickness(0, 0),
-            Padding = new Thickness(0)
+            Margin = (ListIndent != _defaultListIndent) ? ListIndent : _defaultListIndent,
+            Padding = new Thickness(0),
+            LineBreakMode = LineBreakMode.NoWrap
         };
 
         grid.Children.Add(orderedListItem);
@@ -911,12 +1054,45 @@ public class MarkdownView : ContentView
             FormattedText = formattedString,
             VerticalOptions = LayoutOptions.Start,
             HorizontalOptions = LayoutOptions.Fill,
-            Margin = new Thickness(15, 0, 0, 0) // Indent the list item text
+            Padding = new Thickness(0),
+            Margin = new Thickness(0)
         };
 
         grid.Children.Add(listItemLabel);
         Grid.SetRow(listItemLabel, gridRow);
         Grid.SetColumn(listItemLabel, 1);
+    }
+
+    private void AddTaskListItemToGrid(string taskText, bool isChecked, Grid grid, int gridRow)
+    {
+        var checkbox = new CheckBox
+        {
+            IsChecked = isChecked,
+            HorizontalOptions = LayoutOptions.Start,
+            VerticalOptions = LayoutOptions.Center,
+            HeightRequest = 18,
+            WidthRequest = 18,
+            Margin = (ListIndent != _defaultListIndent) ? ListIndent : _defaultListIndent,
+        };
+
+        grid.Children.Add(checkbox);
+        Grid.SetRow(checkbox, gridRow);
+        Grid.SetColumn(checkbox, 0);
+
+        // Add the task list item text
+        var formattedString = CreateFormattedString(taskText, TextColor);
+        var taskLabel = new Label
+        {
+            FormattedText = formattedString,
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Fill,
+            Padding = new Thickness(0),
+            Margin = new Thickness(0)
+        };
+
+        grid.Children.Add(taskLabel);
+        Grid.SetRow(taskLabel, gridRow);
+        Grid.SetColumn(taskLabel, 1);
     }
 
     private Grid CreateTable(string[] lines, int startIndex, int endIndex)
@@ -1001,17 +1177,17 @@ public class MarkdownView : ContentView
     }
 
 
-    private static LayoutOptions GetTextAlignment(string alignmentIndicator)
+    private LayoutOptions GetTextAlignment(string alignmentIndicator)
     {
-        if (alignmentIndicator.StartsWith(':') && alignmentIndicator.EndsWith(':'))
+        if (alignmentIndicator.StartsWith(":") && alignmentIndicator.EndsWith(":"))
         {
             return LayoutOptions.Center;
         }
-        else if (alignmentIndicator.StartsWith(':'))
+        else if (alignmentIndicator.StartsWith(":"))
         {
             return LayoutOptions.Start;
         }
-        else if (alignmentIndicator.EndsWith(':'))
+        else if (alignmentIndicator.EndsWith(":"))
         {
             return LayoutOptions.End;
         }
@@ -1044,6 +1220,7 @@ public class MarkdownView : ContentView
             }
             else if (Uri.TryCreate(imageUrl, UriKind.Absolute, out Uri uriResult))
             {
+
                 if (imageUrl != null && _imageCache.TryGetValue(imageUrl, out ImageSource value))
                 {
                     return value;
@@ -1052,10 +1229,60 @@ public class MarkdownView : ContentView
                 {
                     try
                     {
-                        using var httpClient = new HttpClient();
-                        var imageBytes = await httpClient.GetByteArrayAsync(uriResult);
-                        imageSource = ImageSource.FromStream(() => new MemoryStream(imageBytes));
-                        if (imageUrl != null) _imageCache[imageUrl] = imageSource;
+                        if (imageUrl.ToLowerInvariant().EndsWith(".svg"))
+                        {
+                            var httpClient = new HttpClient();
+
+                            var imageBytes = await httpClient.GetByteArrayAsync(uriResult)
+                                .ConfigureAwait(false);
+                            if (imageBytes != null)
+                            {
+                                var svgString = Encoding.UTF8.GetString(imageBytes);
+                                var svg = new SkiaSharp.Extended.Svg.SKSvg();
+                                using (var stream = new MemoryStream(imageBytes))
+                                {
+                                    svg.Load(stream);
+                                }
+                                var image = new SKBitmap((int)svg.Picture.CullRect.Width, (int)svg.Picture.CullRect.Height);
+                                using (var surface = SKSurface.Create(new SKImageInfo(image.Width, image.Height)))
+                                {
+                                    var canvas = surface.Canvas;
+                                    canvas.Clear(SKColors.Transparent);
+                                    canvas.DrawPicture(svg.Picture);
+                                    canvas.Flush();
+                                    surface.Snapshot().ReadPixels(image.Info, image.GetPixels(), image.RowBytes, 0, 0);
+                                }
+                                var imageStream = new MemoryStream();
+                                image.Encode(SKEncodedImageFormat.Png, 100).SaveTo(imageStream);
+                                imageStream.Position = 0;
+                                imageSource = ImageSource.FromStream(() => imageStream);
+                                if (imageUrl != null) _imageCache[imageUrl] = imageSource;
+
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Failed to download image: {imageUrl}");
+                                imageSource = default;
+                            }
+                            httpClient.Dispose();
+                        }
+                        else
+                        {
+                            using var httpClient = new HttpClient();
+                            var imageBytes = await httpClient.GetByteArrayAsync(uriResult)
+                                .ConfigureAwait(false);
+                            if (imageBytes != null)
+                            {
+                                imageSource = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+                                if (imageUrl != null) _imageCache[imageUrl] = imageSource;
+                            }
+                            else
+                            {
+                                imageSource = default;
+                                Console.WriteLine($"Failed to download image: {imageUrl}");
+                            }
+                            httpClient.Dispose();
+                        }
                     }
                     catch (Exception ex)
                     {

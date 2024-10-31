@@ -1,10 +1,13 @@
 ﻿
+using ChatAI.Controls.MarkdownView;
 using ChatAI.Enums;
 using ChatAI.Models;
 using ChatAI.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
+using static Android.Renderscripts.ScriptGroup;
 
 
 
@@ -88,6 +91,9 @@ public partial class ChatViewModel : ObservableObject
                         {
                             a.Text += chunk;
                         }
+
+                        
+                        
                     }
                     else if (serviceType == ServiceType.Image)
                     {
@@ -98,6 +104,9 @@ public partial class ChatViewModel : ObservableObject
                         a.Image = await openAIService.CreateImage(messageText);
                         IsBusy = false;
                     }
+
+                    
+
                 }
                 catch (Exception ex) {
                     Messages.RemoveAt(Messages.Count - 1);  
@@ -106,6 +115,34 @@ public partial class ChatViewModel : ObservableObject
                     IsBusy = false;
                 }
             });
+
+            /*
+            if (serviceType == ServiceType.Chat)
+            {
+                //post process KaTeX
+                var m = Messages[Messages.Count - 1];
+                string patternInLine = @"\\\((.*?)\\\)"; //in line \( e \)
+                string patternBlock =  @"\\\[(.*?)\\\]"; // block \[ e \]
+                string k = m.Text;
+                bool isChange = false;
+                if (Regex.IsMatch(k, patternInLine))
+                {
+                    k = Regex.Replace(k, patternInLine, "$$$1$");  //in line \( e \) -> $ e $
+                    isChange = true;
+                }
+
+                if (Regex.IsMatch(k, patternBlock))
+                {
+                    k = Regex.Replace(k, patternBlock, "$$$$$1$$$");    //block \[ e \] -> $$ e $$
+                    isChange = true;
+                }
+
+                if (isChange)
+                {
+                    m.Text = k;
+                }
+            }
+            */
             
         }
         else if (message is Message messageObj)
