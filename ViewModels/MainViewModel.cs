@@ -1,8 +1,7 @@
-﻿namespace ChatAI.ViewModels;
+﻿using DevExpress.Maui.Mvvm;
 
-public class MainViewModel() : BaseViewModel
+namespace ChatAI.ViewModels;
+
+public class MainViewModel() : DXObservableObject
 {
-
-
-
 }

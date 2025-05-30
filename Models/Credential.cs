@@ -72,10 +72,6 @@ public class Credential : INotifyPropertyChanged
     }
 
 
-
-
-
-
     public event PropertyChangedEventHandler PropertyChanged;
     private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
     {

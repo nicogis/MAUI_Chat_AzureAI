@@ -9,6 +9,7 @@
              xmlns:strings="clr-namespace:ChatAI.Resources"
              xmlns:local="clr-namespace:ChatAI.ViewModels" 
              x:DataType="local:AboutViewModel"
+             BindingContext="{dx:Ioc Type={x:Type local:AboutViewModel}}"
              x:Name="page">
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Loaded"

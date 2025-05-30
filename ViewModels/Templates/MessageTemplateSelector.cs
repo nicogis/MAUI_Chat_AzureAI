@@ -1,4 +1,6 @@
-﻿namespace ChatAI.ViewModels.Templates;
+﻿using ChatAI.Models;
+
+namespace ChatAI.ViewModels.Templates;
 
 [AcceptEmptyServiceProvider]
 public class MessageTemplateSelector : DataTemplateSelector, IMarkupExtension

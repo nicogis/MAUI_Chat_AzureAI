@@ -3,9 +3,8 @@ using ChatAI.Models;
 using ChatAI.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DevExpress.Maui.Mvvm;
 using System.Collections.ObjectModel;
-
-
 
 namespace ChatAI.ViewModels;
 
@@ -31,16 +30,14 @@ public partial class ChatViewModel : ObservableObject
 
     private readonly IOpenAIService openAIService;
 
-    public Command CommandInit { get; }
+    public IRelayCommand CommandInit { get; }
     
 
     public ChatViewModel(IOpenAIService openAIService)
     {
 
         this.openAIService = openAIService;
-        CommandInit = new Command(Init);
-
-        
+        CommandInit = new RelayCommand(Init);  
     }
 
     
@@ -181,43 +178,9 @@ public partial class ChatViewModel : ObservableObject
     }
 }
 
-public class Message : BaseViewModel
-{
-    public Guid Id { get; } = Guid.NewGuid();
-    public ChatUser Sender { get; set; }
-    public DateTime? SentAt { get; set; } = DateTime.Now;
 
 
-   
 
-    private string text;
-
-    public string Text
-    {
-        get => text;
-        set => SetProperty(ref text, value);
-    }
-
-    public ServiceType ServiceType { get; set; } = ServiceType.Chat;
-
-    public bool IsLastMessage { get; set; }
-
-    private byte[] image;
-
-    public byte[] Image
-    {
-        get => image;
-        set => SetProperty(ref image, value);
-    }
-
-}
-
-public class ChatUser
-{
-    public Guid Id { get; } = Guid.NewGuid();
-    public string Name { get; set; }
-    public string Initials => string.Concat(Name.AsSpan(0, 1), Name.Split(null)[1].AsSpan(0, 1));
-}
 
 
 

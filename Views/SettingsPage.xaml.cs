@@ -2,19 +2,17 @@ using DevExpress.Maui.DataForm;
 using ChatAI.Resources;
 using ChatAI.ViewModels;
 
-
-
 namespace ChatAI.Views;
 
 [XamlCompilation(XamlCompilationOptions.Compile)]
 public partial class SettingsPage : ContentPage
 {
     
-    public SettingsPage(SettingsViewModel settingsViewModel)
+    public SettingsPage()
     {
         
         InitializeComponent();
-        BindingContext = settingsViewModel;
+        
     }
 
     private void DFVCredential_ValidateProperty(object sender, DataFormPropertyValidationEventArgs e)

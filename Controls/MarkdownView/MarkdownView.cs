@@ -46,7 +46,7 @@ namespace ChatAI.Controls.MarkdownView;
 
 public sealed class MarkdownView : ContentView
 {
-    private static readonly Regex EmailRegex = new Regex(@"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", RegexOptions.Compiled);
+    private static readonly Regex EmailRegex = new(@"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", RegexOptions.Compiled);
     
     public static readonly BindableProperty MarkdownTextProperty =
         BindableProperty.Create(nameof(MarkdownText), typeof(string), typeof(MarkdownView), propertyChanged: OnMarkdownTextChanged);
@@ -539,7 +539,7 @@ public sealed class MarkdownView : ContentView
         };
     }
 
-    private View RenderHeading(HeadingBlock block)
+    private Label RenderHeading(HeadingBlock block)
     {
         var formatted = new FormattedString();
 
@@ -612,7 +612,7 @@ public sealed class MarkdownView : ContentView
             return H3FontSize;
     }
 
-    private View RenderQuote(QuoteBlock block)
+    private Border RenderQuote(QuoteBlock block)
     {
         var quoteContent = new VerticalStackLayout()
         {
@@ -665,45 +665,39 @@ public sealed class MarkdownView : ContentView
         return blockquote;
     }
 
-    private View RenderCode(FencedCodeBlock block)
+    private Border RenderCode(FencedCodeBlock block) => new()
     {
-        return new Border
+        BackgroundColor = CodeBlockBackgroundColor,
+        Stroke = new SolidColorBrush(CodeBlockBorderColor),
+        Padding = 8,
+        StrokeShape = new RoundRectangle().WithCornerRadius(4),
+        Content = new Label
         {
-            BackgroundColor = CodeBlockBackgroundColor,
-            Stroke = new SolidColorBrush(CodeBlockBorderColor),
-            Padding = 8,
-            StrokeShape = new RoundRectangle().WithCornerRadius(4),
-            Content = new Label
-            {
-                Text = block.Lines.ToString(),
-                FontFamily = CodeBlockFontFace,
-                TextColor = CodeBlockTextColor,
-                FontSize = CodeBlockFontSize,
-                LineBreakMode = LineBreakMode.WordWrap,
-            }
-        };
-    }
+            Text = block.Lines.ToString(),
+            FontFamily = CodeBlockFontFace,
+            TextColor = CodeBlockTextColor,
+            FontSize = CodeBlockFontSize,
+            LineBreakMode = LineBreakMode.WordWrap,
+        }
+    };
 
-    private View RenderCodeBlock(CodeBlock block)
+    private Border RenderCodeBlock(CodeBlock block) => new()
     {
-        return new Border
+        BackgroundColor = CodeBlockBackgroundColor,
+        Stroke = new SolidColorBrush(CodeBlockBorderColor),
+        Padding = 8,
+        StrokeShape = new RoundRectangle().WithCornerRadius(4),
+        Content = new Label
         {
-            BackgroundColor = CodeBlockBackgroundColor,
-            Stroke = new SolidColorBrush(CodeBlockBorderColor),
-            Padding = 8,
-            StrokeShape = new RoundRectangle().WithCornerRadius(4),
-            Content = new Label
-            {
-                Text = block.Lines.ToString(),
-                FontFamily = CodeBlockFontFace,
-                TextColor = CodeBlockTextColor,
-                FontSize = CodeBlockFontSize,
-                LineBreakMode = LineBreakMode.WordWrap,
-            }
-        };
-    }
+            Text = block.Lines.ToString(),
+            FontFamily = CodeBlockFontFace,
+            TextColor = CodeBlockTextColor,
+            FontSize = CodeBlockFontSize,
+            LineBreakMode = LineBreakMode.WordWrap,
+        }
+    };
 
-    private View RenderTable(Table table)
+    private Grid RenderTable(Table table)
     {
         var grid = new Grid
         {
@@ -720,7 +714,7 @@ public sealed class MarkdownView : ContentView
 
         int rowIndex = 0;
 
-        foreach (TableRow row in table)
+        foreach (TableRow row in table.Cast<TableRow>())
         {
             grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
@@ -762,24 +756,10 @@ public sealed class MarkdownView : ContentView
 
 
 
-    private View RenderFormula(MathBlock mathBlock)
+    private LatexView RenderFormula(MathBlock mathBlock)
     {
         string formularText  = mathBlock.Lines.ToString();
-
-        var grid = new Grid
-        {
-            ColumnDefinitions =
-        {
-            new ColumnDefinition { Width = GridLength.Auto },
-            new ColumnDefinition { Width = GridLength.Auto },
-            new ColumnDefinition { Width = GridLength.Auto }
-        },
-            RowDefinitions =
-        {
-            new RowDefinition { Height = GridLength.Auto }
-        }
-        };
-
+        
         var latexView = new LatexView
         {
             Text = formularText,
@@ -794,8 +774,8 @@ public sealed class MarkdownView : ContentView
 
         return latexView;
     }
-    
-    private View RenderCustomContainer(CustomContainer container)
+
+    private Border RenderCustomContainer(CustomContainer container)
     {
 
         var type = container.TryGetAttributes()?.Classes?.FirstOrDefault() ?? "default";
@@ -824,7 +804,7 @@ public sealed class MarkdownView : ContentView
         };
     }
 
-    private View RenderList(ListBlock listBlock, int nestingLevel = 0)
+    private VerticalStackLayout RenderList(ListBlock listBlock, int nestingLevel = 0)
     {
         var stack = new VerticalStackLayout
         {
@@ -832,7 +812,7 @@ public sealed class MarkdownView : ContentView
             Spacing = 4
         };
 
-        foreach (ListItemBlock item in listBlock)
+        foreach (ListItemBlock item in listBlock.Cast<ListItemBlock>())
         {
             var isChecklist = item.TryGetAttributes()?.Properties?.FirstOrDefault(p => p.Key == "checked").Value != null;
             var isChecked = isChecklist && item.GetAttributes().Properties.First(p => p.Key == "checked").Value == "true";
@@ -967,7 +947,7 @@ public sealed class MarkdownView : ContentView
 
                     if (link.Url.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase))
                     {
-                        tap.Tapped += (_, __) => TriggerEmailClicked(link.Url.Substring("mailto:".Length));
+                        tap.Tapped += (_, __) => TriggerEmailClicked(link.Url["mailto:".Length..]);
                     }
                     else if (EmailRegex.IsMatch(link.Url)) // Detect email addresses
                     {

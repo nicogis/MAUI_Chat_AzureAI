@@ -1,34 +1,15 @@
 ﻿using ChatAI.Resources;
 using CommunityToolkit.Mvvm.Input;
-using System.Windows.Input;
+using DevExpress.Maui.Mvvm;
 
 
 namespace ChatAI.ViewModels;
 
-public class AboutViewModel : BaseViewModel
+public class AboutViewModel : DXObservableObject
 {
-    public const string ViewName = "AboutPage";
-
-    public AboutViewModel()
-    {
-
-        CommandWebSite = new AsyncRelayCommand(OpenSite);
-        CommandInit = new Command(Init);
-        TitleApp = AppInfo.Current.Name;
-        VersionApp = string.Format(AppResources.AboutStringId_CurrentVersion, AppInfo.Current.VersionString);
-
-    }
-
-
-    public static Task<Boolean> OpenSite()
-    {
-        return Browser.OpenAsync(AppResources.AboutStringId_SiteWebCompany, BrowserLaunchMode.External);
-    }
-
-
-    public ICommand CommandInit { get; }
-
+    public IRelayCommand CommandInit { get; }
     public IAsyncRelayCommand CommandWebSite { get; }
+
 
     string titleApp;
     public string TitleApp
@@ -51,6 +32,20 @@ public class AboutViewModel : BaseViewModel
         private set => SetProperty(ref this.versionInfoOnline, value);
     }
 
+    public AboutViewModel()
+    {
+        CommandInit = new RelayCommand(Init);
+        CommandWebSite = new AsyncRelayCommand(OpenSite);
+        
+        TitleApp = AppInfo.Current.Name;
+        VersionApp = string.Format(AppResources.AboutStringId_CurrentVersion, AppInfo.Current.VersionString);
+
+    }
+
+    public static Task<Boolean> OpenSite()
+    {
+        return Browser.OpenAsync(AppResources.AboutStringId_SiteWebCompany, BrowserLaunchMode.External);
+    }
 
     public void Init()
     {

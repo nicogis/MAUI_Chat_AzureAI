@@ -1,4 +1,5 @@
 ﻿using System.Collections.Specialized;
+using ChatAI.Models;
 using ChatAI.Resources;
 using ChatAI.ViewModels;
 
@@ -8,11 +9,11 @@ namespace ChatAI.Views;
 public partial class ChatPage : ContentPage
 {
     private readonly ChatViewModel vm;
-    public ChatPage(ChatViewModel chatViewModel)
+    public ChatPage()
     {
         InitializeComponent();
-        vm = chatViewModel;
-        BindingContext = vm;
+        vm = ((ChatViewModel)BindingContext);
+        //BindingContext = vm;
         vm.Messages.CollectionChanged += OnMessagesCollectionChanged;
     }
     void OnMessagesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

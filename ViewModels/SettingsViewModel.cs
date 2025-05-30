@@ -1,39 +1,34 @@
-﻿using CommunityToolkit.Maui.Alerts;
-using ChatAI.Models;
+﻿using ChatAI.Models;
 using ChatAI.Resources;
 using ChatAI.Services;
+using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Mvvm.Input;
+using DevExpress.Maui.Mvvm;
 
 namespace ChatAI.ViewModels;
 
-public class SettingsViewModel : BaseViewModel
+public class SettingsViewModel : DXObservableObject
 {
-    public const string ViewName = "SettingsPage";
-
+    
     private readonly IOpenAIService openAIService;
 
     public SettingsViewModel(IOpenAIService openAIService)
     {
-        Title = AppResources.MainStringId_TabSettings;
-
         CredentialDataObject = new Credential();
 
-        CommandInit = new Command(Init);
+        CommandInit = new AsyncRelayCommand(Init);
 
         this.openAIService = openAIService;
     }
-
-
-
-
 
     public Credential CredentialDataObject
     {
         get;
     }
 
-    public Command CommandInit { get; }
+    public IAsyncRelayCommand CommandInit { get; }
 
-    async void Init()
+    async Task Init()
     {
         string endPoint;
         string apiKey;

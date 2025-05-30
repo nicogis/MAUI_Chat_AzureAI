@@ -124,7 +124,6 @@ public sealed class LatexView : SKCanvasView
 
     private void OnPainting(object sender, SKPaintSurfaceEventArgs e)
     {
-        SKImageInfo info = e.Info;
         SKSurface surface = e.Surface;
         SKCanvas canvas = surface.Canvas;
 

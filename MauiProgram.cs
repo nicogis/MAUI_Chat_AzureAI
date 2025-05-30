@@ -9,7 +9,6 @@ namespace ChatAI;
 
 public static class MauiProgram
 {
-    
     public static MauiApp CreateMauiApp()
     {
         ThemeManager.ApplyThemeToSystemBars = true;
@@ -38,24 +37,18 @@ public static class MauiProgram
                 essentials.UseVersionTracking();
             });
 
-
-
-
-
-
-
         return builder.Build();
     }
 
     public static MauiAppBuilder RegisterServices(this MauiAppBuilder mauiAppBuilder)
     {
         mauiAppBuilder.Services.AddSingleton<Services.IOpenAIService, Services.OpenAIService>();
-        mauiAppBuilder.Services.AddSingleton<NavigationService>();
         return mauiAppBuilder;
     }
 
     public static MauiAppBuilder RegisterViewModels(this MauiAppBuilder mauiAppBuilder)
     {
+        mauiAppBuilder.Services.AddSingleton<MainViewModel>();
         mauiAppBuilder.Services.AddTransient<ChatViewModel>();
         mauiAppBuilder.Services.AddSingleton<AboutViewModel>();
         mauiAppBuilder.Services.AddTransient<SettingsViewModel>();
@@ -64,9 +57,10 @@ public static class MauiProgram
 
     public static MauiAppBuilder RegisterViews(this MauiAppBuilder mauiAppBuilder)
     {
-        mauiAppBuilder.Services.AddSingleton<ChatPage>();
+        mauiAppBuilder.Services.AddSingleton<MainPage>();
+        mauiAppBuilder.Services.AddTransient<ChatPage>();
         mauiAppBuilder.Services.AddSingleton<AboutPage>();
-        mauiAppBuilder.Services.AddSingleton<SettingsPage>();
+        mauiAppBuilder.Services.AddTransient<SettingsPage>();
         return mauiAppBuilder;
     }
 

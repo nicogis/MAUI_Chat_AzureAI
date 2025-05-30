@@ -8,8 +8,11 @@
              ios:Page.UseSafeArea="true"
              x:Class="ChatAI.Views.SettingsPage"
              xmlns:local="clr-namespace:ChatAI.ViewModels"
+             BindingContext="{dx:Ioc Type={x:Type local:SettingsViewModel}}"
              x:DataType="local:SettingsViewModel"
-             x:Name="page">
+             x:Name="page"
+             Title="{x:Static strings:AppResources.MainStringId_TabSettings}"
+             >
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Appearing"

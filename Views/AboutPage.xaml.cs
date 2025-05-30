@@ -8,16 +8,8 @@ namespace ChatAI.Views;
 public partial class AboutPage : ContentPage
 {
 
-    public AboutPage(AboutViewModel aboutViewModel)
+    public AboutPage()
     {
-
-
         InitializeComponent();
-
-        BindingContext = aboutViewModel;
-
-
-
-
     }
 }

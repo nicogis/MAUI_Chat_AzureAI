@@ -43,7 +43,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Converters\MarkdownToHtmlConverter.cs" />
+	  <Compile Remove="Services\INavigationService.cs" />
+	  <Compile Remove="Services\NavigationService.cs" />
+	  <Compile Remove="ViewModels\BaseViewModel.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -73,12 +75,6 @@
 		<PackageReference Include="Svg.Skia" Version="3.0.3" />
 		<PackageReference Include="System.Text.Json" Version="9.0.5" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.70" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-		<Folder Include="Converters\" />
-		<Folder Include="Models\" />
 	</ItemGroup>
 
 
