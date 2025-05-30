@@ -10,6 +10,7 @@
     xmlns:e="clr-namespace:ChatAI.Enums"
     xmlns:strings="clr-namespace:ChatAI.Resources"
     xmlns:md="clr-namespace:ChatAI.Controls.MarkdownView"
+    x:DataType="vm:ChatViewModel"
     ios:Page.UseSafeArea="true">
 
     <!--xmlns:converters="clr-namespace:ChatAI.Converters"-->
@@ -127,13 +128,13 @@
                 </Grid.Triggers>
             </Grid>
         </DataTemplate>
-        <DataTemplate x:Key="dayGroupTemplate">
+        <DataTemplate x:Key="dayGroupTemplate" x:DataType="{x:Type vm:Message}">
             <dx:DXContentPresenter
                 Margin="10"
                 HorizontalOptions="Center"
                 FontSize="11"
                 FontAttributes="Bold"
-                Content="{Binding Value, StringFormat='{}{0:d}'}"
+                Content="{Binding SentAt, StringFormat='{}{0:d}'}"
                 TextColor="{dx:ThemeColor OnSurfaceVariant}">
             </dx:DXContentPresenter>
         </DataTemplate>

@@ -1,5 +1,5 @@
 ﻿/*
- * MIT License
+MIT License
 
 Copyright (c) 2024 0xc3u
 
@@ -21,19 +21,18 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-*/
-
+using SkiaSharp.Views.Maui.Controls.Hosting;
 namespace ChatAI.Controls.MarkdownView;
+*/
 
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 
+namespace ChatAI.Controls.MarkdownView;
+
 public sealed class LatexView : SKCanvasView
 {
-
-    private System.Drawing.RectangleF _bounds;
-
     public static readonly BindableProperty TextProperty = BindableProperty.Create(propertyName: nameof(Text),
         returnType: typeof(string), declaringType: typeof(LatexView), propertyChanged: OnLatexChanged);
 
@@ -98,6 +97,7 @@ public sealed class LatexView : SKCanvasView
     ~LatexView()
     {
         PaintSurface -= OnPainting;
+        SizeChanged -= (s, e) => UpdateSize();
     }
 
     private void UpdateSize()
@@ -122,7 +122,7 @@ public sealed class LatexView : SKCanvasView
         }
     }
 
-    private void OnPainting(object? sender, SKPaintSurfaceEventArgs e)
+    private void OnPainting(object sender, SKPaintSurfaceEventArgs e)
     {
         SKImageInfo info = e.Info;
         SKSurface surface = e.Surface;
