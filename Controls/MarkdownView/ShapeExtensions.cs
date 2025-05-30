@@ -20,16 +20,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+
 using SkiaSharp.Views.Maui.Controls.Hosting;
 namespace ChatAI.Controls.MarkdownView;
+*/
 
+using Microsoft.Maui.Controls.Shapes;
 
-public static class BuilderExtension
+namespace ChatAI.Controls.MarkdownView;
+public static class ShapeExtensions
 {
-    public static MauiAppBuilder UseMarkdownView(this MauiAppBuilder builder)
+    public static RoundRectangle WithCornerRadius(this RoundRectangle roundRectangle, float cornerRadius)
     {
-        builder.UseSkiaSharp();
-        return builder;
+      roundRectangle.CornerRadius = new CornerRadius(cornerRadius);
+      return roundRectangle;
     }
 }

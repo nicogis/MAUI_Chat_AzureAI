@@ -1,13 +1,9 @@
-﻿
-using ChatAI.Controls.MarkdownView;
-using ChatAI.Enums;
+﻿using ChatAI.Enums;
 using ChatAI.Models;
 using ChatAI.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
-using static Android.Renderscripts.ScriptGroup;
 
 
 

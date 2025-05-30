@@ -20,16 +20,14 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+
 using SkiaSharp.Views.Maui.Controls.Hosting;
 namespace ChatAI.Controls.MarkdownView;
+*/
 
+namespace ChatAI.Controls.MarkdownView;
 
-public static class BuilderExtension
+public class EmailEventArgs : EventArgs
 {
-    public static MauiAppBuilder UseMarkdownView(this MauiAppBuilder builder)
-    {
-        builder.UseSkiaSharp();
-        return builder;
-    }
+    public string Email { get; set; }
 }

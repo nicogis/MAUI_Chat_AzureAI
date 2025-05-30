@@ -1,19 +1,16 @@
-﻿using ChatAI.Services;
-using ChatAI.Views;
-using Application = Microsoft.Maui.Controls.Application;
+﻿using ChatAI.Views;
 
-namespace ChatAI
+namespace ChatAI;
+
+public partial class App : Application
 {
-    public partial class App : Application
+    public App()
     {
-        public App()
-        {
-            InitializeComponent();
+        InitializeComponent();
+    }
 
-            
-            DependencyService.Register<NavigationService>();
-            MainPage = new MainPage();
-            
-        }
+    protected override Window CreateWindow(IActivationState activationState)
+    {
+        return new Window(new MainPage());
     }
 }

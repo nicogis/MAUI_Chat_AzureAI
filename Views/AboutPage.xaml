@@ -9,10 +9,11 @@
              xmlns:strings="clr-namespace:ChatAI.Resources"
              xmlns:local="clr-namespace:ChatAI.ViewModels" 
              x:DataType="local:AboutViewModel"
+             x:Name="page"
              >
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Loaded"
-                                    Command="{Binding CommandInit}" />
+                                    Command="{Binding CommandInit}" BindingContext="{Binding Source={x:Reference page}, Path=BindingContext,x:DataType=ContentPage}" />
     </ContentPage.Behaviors>
 
     <Grid RowDefinitions="100,*,Auto">

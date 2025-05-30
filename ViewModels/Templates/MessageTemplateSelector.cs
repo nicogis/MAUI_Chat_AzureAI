@@ -1,4 +1,6 @@
 ﻿namespace ChatAI.ViewModels.Templates;
+
+[AcceptEmptyServiceProvider]
 public class MessageTemplateSelector : DataTemplateSelector, IMarkupExtension
 {
     public DataTemplate SenderTemplate { get; set; }

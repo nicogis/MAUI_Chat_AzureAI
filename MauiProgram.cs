@@ -9,11 +9,12 @@ namespace ChatAI;
 
 public static class MauiProgram
 {
+    
     public static MauiApp CreateMauiApp()
     {
         ThemeManager.ApplyThemeToSystemBars = true;
-        var builder = MauiApp.CreateBuilder();
-        builder
+
+        var builder = MauiApp.CreateBuilder()
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
             .UseDevExpress(useLocalization: true)
@@ -49,7 +50,7 @@ public static class MauiProgram
     public static MauiAppBuilder RegisterServices(this MauiAppBuilder mauiAppBuilder)
     {
         mauiAppBuilder.Services.AddSingleton<Services.IOpenAIService, Services.OpenAIService>();
-        
+        mauiAppBuilder.Services.AddSingleton<NavigationService>();
         return mauiAppBuilder;
     }
 

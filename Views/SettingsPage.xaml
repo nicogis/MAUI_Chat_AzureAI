@@ -8,11 +8,12 @@
              ios:Page.UseSafeArea="true"
              x:Class="ChatAI.Views.SettingsPage"
              xmlns:local="clr-namespace:ChatAI.ViewModels"
-             x:DataType="local:SettingsViewModel">
+             x:DataType="local:SettingsViewModel"
+             x:Name="page">
 
     <ContentPage.Behaviors>
         <toolkit:EventToCommandBehavior EventName="Appearing"
-                                    Command="{Binding CommandInit}" />
+                                    Command="{Binding CommandInit}" BindingContext="{Binding Source={x:Reference page}, Path=BindingContext,x:DataType=ContentPage}" />
     </ContentPage.Behaviors>
     <ContentPage.Resources>
         <Style TargetType="dx:FormGroupItem">
